@@ -3,6 +3,8 @@ import streamlit as st # Uključujemo ovaj modul jer radimo Streamlit aplikaciju
 import pandas as pd # Potreban za sortiranje. Poslije ćemo ga uzimati kao DataFrame pa nam treba.
 import gspread # Potreban da se povežemo na Google račun.
 
+st.set_page_config(layout="wide")
+
 
 
 def ucitaj_podatke(): # Pišemo funkciju za dohvat podataka iz naše tablice. Toj funkciji ništa ne prosljeđujemo.
