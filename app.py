@@ -52,12 +52,13 @@ with st.form("forma_za_dodavanje_knjige", clear_on_submit=True): # Pravimo obraz
     gumb_dodaj = st.form_submit_button("Dodaj knjigu") # Kod ovih obrazaca ne rade klasični (obični) gumbi koje smo prije koristili ('button'), već moramo imati posebne gumbe.
 
 if gumb_dodaj: # Kad se stisne gumb 'Dodaj knjigu', onda prvo želimo provjeriti je li korisnik upisao naslov, autora, nakladnika, mjesto, godinu i vrstu knjige. Za ocjenu ne provjerava jer je na klizaču (ne upisuje je) i automatski je ponuđena ocjena (početna vrijednost) 5 koja će vrijediti ako korisnik ništa ne odabere.
-    if naslov.strip() and autor.strip() and nakladnik.strip() and mjesto.strip() and godina and vrsta.strip() is not None: # 'strip' uklanja razmake (prazni znak, razmaknica) i dodatne posebne znakove na početku i na kraju 'stringa'. 'Ako je neki tekst upisan u naslov, autora, nakladnika, mjesto, godinu i vrstu, onda od tih šest unesenih stvari treba napraviti listu 'novi_red'.
+    if naslov.strip() and autor.strip() and nakladnik.strip() and mjesto.strip() and godina is not None and vrsta.strip(): # 'strip' uklanja razmake (prazni znak, razmaknica) i dodatne posebne znakove na početku i na kraju 'stringa'. 'Ako je neki tekst upisan u naslov, autora, nakladnika, mjesto, godinu i vrstu, onda od tih šest unesenih stvari treba napraviti listu 'novi_red'.
         novi_red = [naslov.strip(), autor.strip(), nakladnik.strip(), mjesto.strip(), int(godina), vrsta.strip(), ocjena] # Pomoću 'strip' uklanjamo razmake (ako imaju prije i poslije). Godinu šaljemo kao cijeli broj.
 
         radni_list.append_row(novi_red) # To treba dodati u radni list 'knjige'. Metoda 'append_row' će na kraj radnog lista dodati listu. 
 
         st.success("Knjiga je uspješno dodana.") # To je poruka o uspješnom dodavanju.
+        st.rerun() # Ako korisnik doda neku knjigu, želimo da ta knjiga odmah postane vidljiva. To postižemo tako da se pomoću 'st.rerun()' ponovno pokrene aplikacija, odnosno da se sve to osvježi.
 
         # Ako je sve to uneseno, onda će se svi ti unesnei podaci dodati (pomoću 'append_row') u radni list.
     else:
@@ -74,13 +75,17 @@ if knjige.empty: # Provjeravamo je li DataFrame 'knjige' prazan. Ako je prazan, 
 
 else:
     trazeni_autor = st.text_input("Upišite autora:") # Ako ima knjiga, onda pitamo korisnika da upiše nekog autora kojeg pretražuje.
-    trazena_godina = st.number_input("Upišite godinu:", min_value=1900, max_value=2026, value=None) # Ako korisnik želi pretraživati po godini.
+    trazena_godina = st.number_input("Upišite godinu:", min_value=1800, max_value=2026, value=None) # Ako korisnik želi pretraživati po godini.
 
     filtrirane_knjige = knjige # Sav sadržaj koji imamo u DateFrame 'knjige' smo kopirali u novi DateFrame 'filtrirane_knjige'. Kad filtriramo po nekom kriteriju, dobit ćemo novi DataFrame u kojem će biti samo neki podaci koje je korisnik tražio (samo knjiga željenog autora ili napisana određene godine).
 
-    if trazeni_autor.strip: # Ako je korisnik upisao pretraživanje samo traženog autora. Pomoću 'strip' uklanjamo suvišne razmake (prije ili poslije upisanog ili ako se upisano sastoji samo od razmaka pa se to neće prihvatiti).
-        filtrirane_knjige = filtrirane_knjige[filtrirane_knjige["Autor"]
-                                                .str.contains(trazeni_autor.strip(), case=False)] # Moramo dobiti neke nove vrijednosti u novom DateFrameu 'filtrirane_knjige'. Naredbama kažemo da uzme DateFrame 'filtrirane_knjige' u kojem se nalaze sve izvorne knjige (još ništa nije filtrirano). U uglatoj zagradi pišemo koji stupac treba gledati ako je korisnik napisao da treba pretraživati po autoru.
+    if trazeni_autor.strip(): # Ako je korisnik upisao pretraživanje samo traženog autora. Pomoću 'strip' uklanjamo suvišne razmake (prije ili poslije upisanog ili ako se upisano sastoji samo od razmaka pa se to neće prihvatiti).
+        filtrirane_knjige = filtrirane_knjige[
+            filtrirane_knjige["Autor"].str.contains(
+                trazeni_autor.strip(),
+                case=False
+            )
+        ] # Moramo dobiti neke nove vrijednosti u novom DateFrameu 'filtrirane_knjige'. Naredbama kažemo da uzme DateFrame 'filtrirane_knjige' u kojem se nalaze sve izvorne knjige (još ništa nije filtrirano). U uglatoj zagradi pišemo koji stupac treba gledati ako je korisnik napisao da treba pretraživati po autoru.
 # 'str.contains' Kad korisnik nešto upiše, onda 'contains' pretražuje pojavljuje li se negdje u nazivu ta upisana riječ (ne traži posve točna podudaranja). Pretražuje pojavljuje li se ono što je upisano u varijabli 'traženi_autor'. Pomoću 'strip' uklanjamo razmake da ne ovisimo o njima. Parametar 'case=False' služi da ne ovisimo o velikim i malim slovima.
 
     if trazena_godina is not None: # Ako korisnik upiše neku traženu godinu.
@@ -104,9 +109,9 @@ else: # Briše ako ima knjiga za brisanje. Prije smo brisali pomoću indeksa, al
     def opis_knjige(indeks): # Definiramo funkciju 'opis_knjige' kojoj će se proslijediti indeks knjige zato što će u tom padajućem izborniku raditi s indeksima (brojevima). Budući da ne želimo da se korisniku tu pokazuju brojevi 1, 2, 3... jer ne zna što briše, onda će ta funkcija taj indeks pretvoriti u opis knjige (naziv, godina...).
         knjiga = knjige.iloc[indeks] # Da dohvatimo u varijablu 'knjiga' iz DateFramea 'knjige' treba nam metoda 'iloc' kojoj će se proslijediti taj indeks i u varijablu 'knjiga' će vratiti sve vrijednosti koje su na tom indeksu (naslov, autor, nakladnik, mjesto, godina, vrsta, ocjena).
 
-        return(f"Knjiga '{knjiga["Naslov"]}' autora {knjiga["Autor"]} koju je nakladnik {knjiga["Nakladnik"]} u mjestu {knjiga["Mjesto"]} objavio {int(knjiga["Godina"])}. godine je po vrsti {knjiga["Vrsta"]} i ima ocjenu {knjiga["Ocjena"]}.") # Funkcija pomoću return vraća opis knjige. Dohvaća se što piše u poljima 'Naslov', 'Autor', 'Nakladnik', 'Mjesto', 'Godina', 'Vrsta' i 'Ocjena'.
+        return(f"Knjiga '{knjiga['Naslov']}' autora {knjiga['Autor']} koju je nakladnik {knjiga['Nakladnik']} u mjestu {knjiga['Mjesto']} objavio {int(knjiga['Godina'])}. godine je po vrsti {knjiga['Vrsta']} i ima ocjenu {knjiga['Ocjena']}.") # Funkcija pomoću return vraća opis knjige. Dohvaća se što piše u poljima 'Naslov', 'Autor', 'Nakladnik', 'Mjesto', 'Godina', 'Vrsta' i 'Ocjena'.
 
-    odabrani_indeks = st.selectbox("Odaberite tekst za brisanje.",
+    odabrani_indeks = st.selectbox("Odaberite knjigu za brisanje.",
                                    options=range(len(knjige)),
                                    index=None,
                                    placeholder="Odaberite jednu knjigu",
