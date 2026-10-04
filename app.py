@@ -28,7 +28,7 @@ if not knjige.empty: # Ako nije prazan, DataFrame (ima knjiga), onda godine i oc
     knjige["Ocjena"] = pd.to_numeric(knjige["Ocjena"], errors="coerce") # Neka uzme stupac 'Ocjena' i pretvori u broj. 
 
 st.title("Moja kućna knjižnica") # Postavljamo naslov.
-st.subheader("Neke knjige koje posjedujem i čitam.") # Postavljamo podnaslov.
+st.subheader("Neke knjige koje posjedujem i rado čitam.") # Postavljamo podnaslov.
 
 if knjige.empty: # Prije prikaza knjiga želimo provjeriti ima li uopće knjiga u DataFrameu.
     st.info("U tablici još nema knjiga.") # Ako nema knjiga (prazan DateaFrame), onda ispisuje informativnu poruku plave boje.
