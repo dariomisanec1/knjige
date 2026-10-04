@@ -1,9 +1,13 @@
+
 # Uključujemo potrebne module:
 import streamlit as st # Uključujemo ovaj modul jer radimo Streamlit aplikaciju.
 import pandas as pd # Potreban za sortiranje. Poslije ćemo ga uzimati kao DataFrame pa nam treba.
 import gspread # Potreban da se povežemo na Google račun.
 
 st.set_page_config(layout="wide") # Parametar koji postiže da aplikacija neće biti stisnuta samo u uskom središnjem stupcu, već će se cijeli prozor aplikacije proširiti od lijevog do desnog ruba na punu širinu zaslona.
+
+if "poruka" not in st.session_state:
+    st.session_state["poruka"] = None
 
 
 
@@ -24,9 +28,9 @@ def ucitaj_podatke(): # Pišemo funkciju za dohvat podataka iz naše tablice. To
 
 knjige, radni_list = ucitaj_podatke() # Pozovemo funkciju i želimo da nam raspakira to što povuče u dvije varijable. Vratit će n-torku koju će raspakirati na varijable 'knjige' i 'radni_list'.
 
-if "poruka" in st.session_state:
+if st.session_state["poruka"] is not None:
     st.success(st.session_state["poruka"])
-    del st.session_state["poruka"]
+    st.session_state["poruka"] = None
 
 
 
