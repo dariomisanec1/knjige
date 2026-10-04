@@ -1,8 +1,9 @@
-
 # Uključujemo potrebne module:
 import streamlit as st # Uključujemo ovaj modul jer radimo Streamlit aplikaciju.
 import pandas as pd # Potreban za sortiranje... Poslije ćemo ga uzimati kao DataFrame pa nam treba.
 import gspread # Potreban da se povežemo na Google račun.
+
+
 
 def ucitaj_podatke(): # Pišemo funkciju za dohvat podataka iz naše tablice. Toj funkciji ništa ne prosljeđujemo.
     podaci_računa = dict(st.secrets["gcp_service_account"]) # Prvo želimo povući tajne podatke o našem Google računu. Pomoću 'dict' te podatke ('st.secrets') iz datoteke 'secrets.toml' pretvaramo u rječnik jer funkcija u sljedećem redu (koja će primiti te podatke) očekuje da su ti podaci u obliku rječnika. U dio 'gcp_service_account' ćemo kopirati te osjetljive podatke koje će pretvoriti u rječnik.
@@ -18,6 +19,8 @@ def ucitaj_podatke(): # Pišemo funkciju za dohvat podataka iz naše tablice. To
 
 knjige, radni_list = ucitaj_podatke() # Pozovemo funkciju i želimo da nam raspakira to što povuče u dvije varijable. Vratit će n-torku koju će raspakirati na varijable 'knjige' i 'radni_list'.
 
+
+
 # Prikaz knjiga: Prikaz podataka iz naše tablice.
 # Provjeravamo je li DataFrame 'knjige' prazan. Ako je prazan, ne treba ništa pripremati ni raditi ni prikazivati.
 if not knjige.empty: # Ako nije prazan, DataFrame (ima knjiga), onda godine i ocjene pretvaramo u brojeve. (To trenutno već izgledaju kao brojevi, ali to neće biti brojevi kad te podatke povuče.) Trebaju postati brojevi jer ćemo to sortirati.
@@ -31,6 +34,7 @@ if knjige.empty: # Prije prikaza knjiga želimo provjeriti ima li uopće knjiga 
     st.info("U tablici još nema knjiga.") # Ako nema knjiga (prazan DateaFrame), onda ispisuje informativnu poruku plave boje.
 else:
     st.dataframe(knjige, hide_index=True) # Inače ako ima knjiga, onda 'streamlit dataframe' uzme knjige (dataframe knjige) i od njih napravi svoj 'dataframe' koji će lijepo izgledati u njegovom prikazu, tj. 'streamlit aplikaciji'. Ako nemamo 'hide_index=True', onda bi nam 'pandas' pravio svoj dodatni stupac s nekim svojim indeksima, a to je bespotrebno.
+
 
 
 # Dodavanje knjiga: Dodajmo nekoliko knjiga u našu tablicu.
@@ -61,7 +65,7 @@ if gumb_dodaj: # Kad se stisne gumb 'Dodaj knjigu', onda prvo želimo provjeriti
 
 
 
-# Pretraživanje knjiga: Omogućimo pretraživanje knjiga po vrsti i godini.
+# Pretraživanje knjiga: Omogućimo pretraživanje knjiga po autoru i godini.
 
 st.subheader("Pretraži knjige")
 
@@ -69,20 +73,20 @@ if knjige.empty: # Provjeravamo je li DataFrame 'knjige' prazan. Ako je prazan, 
     st.info("Nema knjiga za pretraživanje.")
 
 else:
-    trazena_vrsta = st.text_input("Upišite vrstu:") # Ako ima knjiga, onda pitamo korisnika da upiše neku vrstu koju pretražuje.
+    trazeni_autor = st.text_input("Upišite autora:") # Ako ima knjiga, onda pitamo korisnika da upiše nekog autora kojeg pretražuje.
     trazena_godina = st.number_input("Upišite godinu:", min_value=1900, max_value=2026, value=None) # Ako korisnik želi pretraživati po godini.
 
-    filtrirane_knjige = knjige # Sav sadržaj koji imamo u DateFrame 'knjige' smo kopirali u novi DateFrame 'filtrirane_knjige'. Kad filtriramo po nekom kriteriju, dobit ćemo novi DataFrame u kojem će biti samo neki podaci koje je korisnik tražio (samo iz željene vrste ili godine...).
+    filtrirane_knjige = knjige # Sav sadržaj koji imamo u DateFrame 'knjige' smo kopirali u novi DateFrame 'filtrirane_knjige'. Kad filtriramo po nekom kriteriju, dobit ćemo novi DataFrame u kojem će biti samo neki podaci koje je korisnik tražio (samo knjiga željenog autora ili napisana određene godine).
 
-    if trazena_vrsta.strip: # Ako je korisnik upisao pretraživanje samo tražene vrste. Pomoću 'strip' uklanjamo suvišne razmake (prije ili poslije upisanog ili ako se upisano sastoji samo od razmaka pa se to neće prihvatiti).
-        filtrirane_knjige = filtrirane_knjige[filtrirane_knjige["Vrsta"]
-                                                .str.contains(trazena_vrsta.strip(), case=False)] # Moramo dobiti neke nove vrijednosti u novom DateFrameu 'filtrirane_knjige'. Naredbama kažemo da uzme DateFrame 'filtrirane_knjige' u kojem se nalaze sve izvorne knjige (još ništa nije filtrirano). U uglatoj zagradi pišemo koji stupac treba gledati ako je korisnik napisao da treba pretraživati po vrsti.
-# 'str.contains' Kad korisnik nešto upiše, onda 'contains' pretražuje pojavljuje li se negdje u nazivu ta upisana riječ (ne traži posve točna podudaranja). Pretražuje pojavljuje li se ono što je upisano u varijabli 'tražena_vrsta'. Pomoću 'strip' uklanjamo razmake da ne ovisimo o njima. Parametar 'case=False' služi da ne ovisimo o velikim i malim slovima.
+    if trazeni_autor.strip: # Ako je korisnik upisao pretraživanje samo traženog autora. Pomoću 'strip' uklanjamo suvišne razmake (prije ili poslije upisanog ili ako se upisano sastoji samo od razmaka pa se to neće prihvatiti).
+        filtrirane_knjige = filtrirane_knjige[filtrirane_knjige["Autor"]
+                                                .str.contains(trazeni_autor.strip(), case=False)] # Moramo dobiti neke nove vrijednosti u novom DateFrameu 'filtrirane_knjige'. Naredbama kažemo da uzme DateFrame 'filtrirane_knjige' u kojem se nalaze sve izvorne knjige (još ništa nije filtrirano). U uglatoj zagradi pišemo koji stupac treba gledati ako je korisnik napisao da treba pretraživati po autoru.
+# 'str.contains' Kad korisnik nešto upiše, onda 'contains' pretražuje pojavljuje li se negdje u nazivu ta upisana riječ (ne traži posve točna podudaranja). Pretražuje pojavljuje li se ono što je upisano u varijabli 'traženi_autor'. Pomoću 'strip' uklanjamo razmake da ne ovisimo o njima. Parametar 'case=False' služi da ne ovisimo o velikim i malim slovima.
 
     if trazena_godina is not None: # Ako korisnik upiše neku traženu godinu.
         filtrirane_knjige = filtrirane_knjige[filtrirane_knjige["Godina"] == int(trazena_godina)] # U DataFrame gleda stupac 'godina'. Kad naiđe na godinu koja je jednaka traženoj upisanoj godini (pomoću 'int' pretvorena u cijeli broj), onda će izbaciti knjige nastale tijekom te upisane godine.
 
-    if filtrirane_knjige.empty: # Ako je korisnik upisao nepostojeću vrstu ili godinu tijekom koje nije izdana nijedna navedena knjiga, onda će 'filtrirane_knjige' biti prazno pa će se ispisati info poruka.
+    if filtrirane_knjige.empty: # Ako je korisnik upisao nepostojećeg autora ili nepostojeću godinu (tijekom koje nije izdana nijedna navedena knjiga), onda će 'filtrirane_knjige' biti prazno pa će se ispisati info poruka.
         st.info("Nije pronađena nijedna knjiga.")
 
     else: 
@@ -131,19 +135,17 @@ else: # Briše ako ima knjiga za brisanje. Prije smo brisali pomoću indeksa, al
 
 
 
-# Najbolje knjige: Prikažimo 3 najbolje knjige po ocjeni.
+# Najbolje knjige: Prikažimo najboljih pet knjiga po ocjeni.
 
-st.subheader("Najbolje tri knjige po ocjeni") # To je podnaslov.
+st.subheader("Najboljih pet knjiga po ocjeni") # To je podnaslov.
 
 if knjige.empty:
     st.info("Nema nikakvih knjiga za prikaz.")
 
 else:
-    najbolje_tri = knjige.sort_values(by="Ocjena", ascending=False).head(3) # Ako ima knjiga, onda uzima DataFrame 'knjige' i pomoću metode 'sort_values' za sortiranje po kriteriju (stupac) 'Ocjena'.
+    najboljih_pet = knjige.sort_values(by="Ocjena", ascending=False).head(5) # Ako ima knjiga, onda uzima DataFrame 'knjige' i pomoću metode 'sort_values' za sortiranje po kriteriju (stupac) 'Ocjena'.
     # Općenito, kad sortira, ako mu ne kažemo drugačije, on će automatski sam sortirati od najmanje prema najvećoj vrijednosti.
     # Budući da u ovom slučaju želimo sortirati od najveće prema najmanjoj ocjeni, upisujemo 'ascending=False'. Ako mu ne kažemo drugačije, onda će inače biti 'False'.
-    # 'head(3) znači da želimo prikaz 3 najbolje knjige.
+    # 'head(5) znači da želimo prikaz najboljih 5 knjiga.
 
-    st.dataframe(najbolje_tri, hide_index=True) # Pravimo novi streamlit dataframe od dataframe 'najbolje_tri'. Opet skrivamo stupac s indeksima.
-
-
+    st.dataframe(najboljih_pet, hide_index=True) # Pravimo novi streamlit dataframe od dataframe 'najboljih_pet'. Opet skrivamo stupac s indeksima.
