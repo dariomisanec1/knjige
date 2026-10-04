@@ -1,13 +1,9 @@
-
 # Uključujemo potrebne module:
 import streamlit as st # Uključujemo ovaj modul jer radimo Streamlit aplikaciju.
 import pandas as pd # Potreban za sortiranje. Poslije ćemo ga uzimati kao DataFrame pa nam treba.
 import gspread # Potreban da se povežemo na Google račun.
 
 st.set_page_config(layout="wide") # Parametar koji postiže da aplikacija neće biti stisnuta samo u uskom središnjem stupcu, već će se cijeli prozor aplikacije proširiti od lijevog do desnog ruba na punu širinu zaslona.
-
-if "poruka" not in st.session_state:
-    st.session_state["poruka"] = None
 
 
 
@@ -27,10 +23,6 @@ def ucitaj_podatke(): # Pišemo funkciju za dohvat podataka iz naše tablice. To
 
 
 knjige, radni_list = ucitaj_podatke() # Pozovemo funkciju i želimo da nam raspakira to što povuče u dvije varijable. Vratit će n-torku koju će raspakirati na varijable 'knjige' i 'radni_list'.
-
-if st.session_state["poruka"] is not None:
-    st.success(st.session_state["poruka"])
-    st.session_state["poruka"] = None
 
 
 
@@ -70,7 +62,7 @@ if gumb_dodaj: # Kad se stisne gumb 'Dodaj knjigu', onda prvo želimo provjeriti
 
         radni_list.append_row(novi_red) # To treba dodati u radni list 'knjige'. Metoda 'append_row' će na kraj radnog lista dodati listu. 
 
-        st.session_state["poruka"] = "Knjiga je uspješno dodana." # To je poruka o uspješnom dodavanju.
+        st.success("Knjiga je uspješno dodana.") # To je poruka o uspješnom dodavanju.
         st.rerun() # Ako korisnik doda neku knjigu, želimo da ta knjiga odmah postane vidljiva. To postižemo tako da se pomoću 'st.rerun()' ponovno pokrene aplikacija, odnosno da se sve to osvježi.
         # Ako je sve to uneseno, onda će se svi ti unesnei podaci dodati (pomoću 'append_row') u radni list.
     else:
@@ -144,7 +136,7 @@ else: # Briše ako ima knjiga za brisanje. Prije smo brisali pomoću indeksa, al
             redak_u_tablici =  odabrani_indeks + 2 # Pravimo novu varijablu 'redak_u_tablici'. To je redak koji će se obrisati. U pandas DataFrameu indeksi kreću od 0 i u njemu ne postoji zaglavlje. U našoj tablici (bazi) indeksi kreću od 1 i postoji zaglavlje. Prva knjiga je u tablici (baza u Google Sheetsu) na indeksu 2 (zaglavlje je na indeksu 1). U pandas DataFrameu je prva knjiga na indeksu 0. Stoga odabrani indeks povećavamo za 2.
             radni_list.delete_rows(redak_u_tablici) # Naređujemo da uzme 'radni_list' i iskoristi metodu 'delete_rows' za brisanje redova, točnije brisanje reda 'redak_u_tablici'.
 
-            st.session_state["poruka"] = "Knjiga je uspješno izbrisana."
+            st.success("Knjiga je uspješno izbrisana.")
             st.rerun() # Ako korisnik obriše neku knjigu, želimo da ta knjiga više ne bude vidljiva u padajućem izborniku (da je više nema, odnosno da se više ne vidi). To postižemo tako da se pomoću 'st.rerun()' ponovno pokrene aplikacija, odnosno da se sve to osvježi.
 
         else:
