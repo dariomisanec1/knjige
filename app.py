@@ -1,6 +1,6 @@
 # Uključujemo potrebne module:
 import streamlit as st # Uključujemo ovaj modul jer radimo Streamlit aplikaciju.
-import pandas as pd # Potreban za sortiranje... Poslije ćemo ga uzimati kao DataFrame pa nam treba.
+import pandas as pd # Potreban za sortiranje. Poslije ćemo ga uzimati kao DataFrame pa nam treba.
 import gspread # Potreban da se povežemo na Google račun.
 
 
@@ -109,7 +109,7 @@ else: # Briše ako ima knjiga za brisanje. Prije smo brisali pomoću indeksa, al
     def opis_knjige(indeks): # Definiramo funkciju 'opis_knjige' kojoj će se proslijediti indeks knjige zato što će u tom padajućem izborniku raditi s indeksima (brojevima). Budući da ne želimo da se korisniku tu pokazuju brojevi 1, 2, 3... jer ne zna što briše, onda će ta funkcija taj indeks pretvoriti u opis knjige (naziv, godina...).
         knjiga = knjige.iloc[indeks] # Da dohvatimo u varijablu 'knjiga' iz DateFramea 'knjige' treba nam metoda 'iloc' kojoj će se proslijediti taj indeks i u varijablu 'knjiga' će vratiti sve vrijednosti koje su na tom indeksu (naslov, autor, nakladnik, mjesto, godina, vrsta, ocjena).
 
-        return(f"Knjiga '{knjiga['Naslov']}' autora {knjiga['Autor']} koju je nakladnik {knjiga['Nakladnik']} u mjestu {knjiga['Mjesto']} objavio {int(knjiga['Godina'])}. godine je po vrsti {knjiga['Vrsta']} i ima ocjenu {knjiga['Ocjena']}.") # Funkcija pomoću return vraća opis knjige. Dohvaća se što piše u poljima 'Naslov', 'Autor', 'Nakladnik', 'Mjesto', 'Godina', 'Vrsta' i 'Ocjena'.
+        return(f"Knjiga '{knjiga['Naslov']}' čiji je autor {knjiga['Autor']} i koju je nakladnik {knjiga['Nakladnik']} u mjestu {knjiga['Mjesto']} objavio {int(knjiga['Godina'])}. godine je po vrsti {knjiga['Vrsta']} i ima ocjenu {knjiga['Ocjena']}.") # Funkcija pomoću return vraća opis knjige. Dohvaća se što piše u poljima 'Naslov', 'Autor', 'Nakladnik', 'Mjesto', 'Godina', 'Vrsta' i 'Ocjena'.
 
     odabrani_indeks = st.selectbox("Odaberite knjigu za brisanje.",
                                    options=range(len(knjige)),
@@ -133,6 +133,7 @@ else: # Briše ako ima knjiga za brisanje. Prije smo brisali pomoću indeksa, al
             redak_u_tablici =  odabrani_indeks + 2 # Pravimo novu varijablu 'redak_u_tablici'. To je redak koji će se obrisati. U pandas DataFrameu indeksi kreću od 0 i u njemu ne postoji zaglavlje. U našoj tablici (bazi) indeksi kreću od 1 i postoji zaglavlje. Prva knjiga je u tablici (baza u Google Sheetsu) na indeksu 2 (zaglavlje je na indeksu 1). U pandas DataFrameu je prva knjiga na indeksu 0. Stoga odabrani indeks povećavamo za 2.
             radni_list.delete_rows(redak_u_tablici) # Naređujemo da uzme 'radni_list' i iskoristi metodu 'delete_rows' za brisanje redova, točnije brisanje reda 'redak_u_tablici'.
 
+            st.success("Knjiga je uspješno izbrisana.")
             st.rerun() # Ako korisnik obriše neku knjigu, želimo da ta knjiga više ne bude vidljiva u padajućem izborniku (da je više nema, odnosno da se više ne vidi). To postižemo tako da se pomoću 'st.rerun()' ponovno pokrene aplikacija, odnosno da se sve to osvježi.
 
         else:
