@@ -52,7 +52,7 @@ with st.form("forma_za_dodavanje_knjige", clear_on_submit=True): # Pravimo obraz
     gumb_dodaj = st.form_submit_button("Dodaj knjigu") # Kod ovih obrazaca ne rade klasični (obični) gumbi koje smo prije koristili ('button'), već moramo imati posebne gumbe.
 
 if gumb_dodaj: # Kad se stisne gumb 'Dodaj knjigu', onda prvo želimo provjeriti je li korisnik upisao naslov, autora, nakladnika, mjesto, godinu i vrstu knjige. Za ocjenu ne provjerava jer je na klizaču (ne upisuje je) i automatski je ponuđena ocjena (početna vrijednost) 5 koja će vrijediti ako korisnik ništa ne odabere.
-    if naslov.strip() and autor.strip() and nakladnik.strip() and mjesto.strip() and godina.strip() and vrsta.strip() and godina is not None: # 'strip' uklanja razmake (prazni znak, razmaknica) i dodatne posebne znakove na početku i na kraju 'stringa'. 'Ako je neki tekst upisan u naslov, autora, nakladnika, mjesto, godinu i vrstu, onda od tih šest unesenih stvari treba napraviti listu 'novi_red'.
+    if naslov.strip() and autor.strip() and nakladnik.strip() and mjesto.strip() and godina and vrsta.strip() is not None: # 'strip' uklanja razmake (prazni znak, razmaknica) i dodatne posebne znakove na početku i na kraju 'stringa'. 'Ako je neki tekst upisan u naslov, autora, nakladnika, mjesto, godinu i vrstu, onda od tih šest unesenih stvari treba napraviti listu 'novi_red'.
         novi_red = [naslov.strip(), autor.strip(), nakladnik.strip(), mjesto.strip(), int(godina), vrsta.strip(), ocjena] # Pomoću 'strip' uklanjamo razmake (ako imaju prije i poslije). Godinu šaljemo kao cijeli broj.
 
         radni_list.append_row(novi_red) # To treba dodati u radni list 'knjige'. Metoda 'append_row' će na kraj radnog lista dodati listu. 
