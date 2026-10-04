@@ -3,12 +3,14 @@ import streamlit as st # Uključujemo ovaj modul jer radimo Streamlit aplikaciju
 import pandas as pd # Potreban za sortiranje. Poslije ćemo ga uzimati kao DataFrame pa nam treba.
 import gspread # Potreban da se povežemo na Google račun.
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide") # Parametar koji postiže da aplikacija neće biti stisnuta samo u uskom središnjem stupcu, već će se cijeli prozor aplikacije proširiti od lijevog do desnog ruba na punu širinu zaslona.
 
 
 
 def ucitaj_podatke(): # Pišemo funkciju za dohvat podataka iz naše tablice. Toj funkciji ništa ne prosljeđujemo.
+    
     podaci_računa = dict(st.secrets["gcp_service_account"]) # Prvo želimo povući tajne podatke o našem Google računu. Pomoću 'dict' te podatke ('st.secrets') iz datoteke 'secrets.toml' pretvaramo u rječnik jer funkcija u sljedećem redu (koja će primiti te podatke) očekuje da su ti podaci u obliku rječnika. U dio 'gcp_service_account' ćemo kopirati te osjetljive podatke koje će pretvoriti u rječnik.
+    
     klijent = gspread.service_account_from_dict(podaci_računa) # Pravimo klijenta (objekt) koji će se spajati na tu našu tablicu (bazu) i tamo nešto moći raditi. Funkciji 'service_account_from_dict' prosljeđujemo podatke računa. Ona će od tih podataka napraviti klijenta (objekt) koji će se spojiti na tablicu i uređivati.
 
     tablica = klijent.open("KNJIGE") # Otvaramo tablicu pomoću metode 'open'. Koristimo klijenta (objekt) koji se može spojiti na tablicu.
@@ -18,6 +20,7 @@ def ucitaj_podatke(): # Pišemo funkciju za dohvat podataka iz naše tablice. To
     knjige = pd.DataFrame(podaci) # Od podataka pravimo DataFrame (kao neka tablica koju je lakše sortirati i izdvajati iz nje). U zgaradi piše od kojih podataka (varijabla 'podaci') pravimo DataFrame i to se sprema u varijablu 'knjige'.
 
     return knjige, radni_list # Funkcija treba vraćati DataFrame koji je u varijabli 'knjige' i vraćati radni list u kojem su upisani podaci u varijabli 'radni_list'.
+
 
 knjige, radni_list = ucitaj_podatke() # Pozovemo funkciju i želimo da nam raspakira to što povuče u dvije varijable. Vratit će n-torku koju će raspakirati na varijable 'knjige' i 'radni_list'.
 
@@ -51,7 +54,7 @@ with st.form("forma_za_dodavanje_knjige", clear_on_submit=True): # Pravimo obraz
     vrsta = st.text_input("Vrsta knjige:")
     ocjena = st.slider("Ocjena knjige:", min_value=1, max_value=10, value=5) # 'slider' je klizač. 'value' je početno postavljena ocjena dok ne odaberemo neku drugu.
 
-    gumb_dodaj = st.form_submit_button("Dodaj knjigu") # Kod ovih obrazaca ne rade klasični (obični) gumbi koje smo prije koristili ('button'), već moramo imati posebne gumbe.
+    gumb_dodaj = st.form_submit_button("Dodaj knjigu.") # Kod ovih obrazaca ne rade klasični (obični) gumbi koje smo prije koristili ('button'), već moramo imati posebne gumbe.
 
 if gumb_dodaj: # Kad se stisne gumb 'Dodaj knjigu', onda prvo želimo provjeriti je li korisnik upisao naslov, autora, nakladnika, mjesto, godinu i vrstu knjige. Za ocjenu ne provjerava jer je na klizaču (ne upisuje je) i automatski je ponuđena ocjena (početna vrijednost) 5 koja će vrijediti ako korisnik ništa ne odabere.
     if naslov.strip() and autor.strip() and nakladnik.strip() and mjesto.strip() and godina is not None and vrsta.strip(): # 'strip' uklanja razmake (prazni znak, razmaknica) i dodatne posebne znakove na početku i na kraju 'stringa'. 'Ako je neki tekst upisan u naslov, autora, nakladnika, mjesto, godinu i vrstu, onda od tih šest unesenih stvari treba napraviti listu 'novi_red'.
@@ -61,7 +64,6 @@ if gumb_dodaj: # Kad se stisne gumb 'Dodaj knjigu', onda prvo želimo provjeriti
 
         st.success("Knjiga je uspješno dodana.") # To je poruka o uspješnom dodavanju.
         st.rerun() # Ako korisnik doda neku knjigu, želimo da ta knjiga odmah postane vidljiva. To postižemo tako da se pomoću 'st.rerun()' ponovno pokrene aplikacija, odnosno da se sve to osvježi.
-
         # Ako je sve to uneseno, onda će se svi ti unesnei podaci dodati (pomoću 'append_row') u radni list.
     else:
         st.warning("Unesite naslov, autora, nakladnika, mjesto, godinu i vrstu knjige.") # Ako nije sve to upisano, ispisuje žutu poruku upozorenja.
@@ -76,8 +78,8 @@ if knjige.empty: # Provjeravamo je li DataFrame 'knjige' prazan. Ako je prazan, 
     st.info("Nema knjiga za pretraživanje.")
 
 else:
-    trazeni_autor = st.text_input("Upišite autora:") # Ako ima knjiga, onda pitamo korisnika da upiše nekog autora kojeg pretražuje.
-    trazena_godina = st.number_input("Upišite godinu:", min_value=1800, max_value=2026, value=None) # Ako korisnik želi pretraživati po godini.
+    trazeni_autor = st.text_input("Upišite traženog autora za pretraživanje po željenom autoru:", placeholder="Primjerice: August Šenoa") # Ako ima knjiga, onda pitamo korisnika da upiše nekog autora kojeg pretražuje.
+    trazena_godina = st.number_input("Upišite traženu godinu za pretraživanje po željenoj godini:", min_value=1800, max_value=2026, value=None, placeholder="Primjerice: 1941") # Ako korisnik želi pretraživati po godini.
 
     filtrirane_knjige = knjige # Sav sadržaj koji imamo u DateFrame 'knjige' smo kopirali u novi DateFrame 'filtrirane_knjige'. Kad filtriramo po nekom kriteriju, dobit ćemo novi DataFrame u kojem će biti samo neki podaci koje je korisnik tražio (samo knjiga željenog autora ili napisana određene godine).
 
@@ -116,10 +118,9 @@ else: # Briše ako ima knjiga za brisanje. Prije smo brisali pomoću indeksa, al
     odabrani_indeks = st.selectbox("Odaberite knjigu za brisanje.",
                                    options=range(len(knjige)),
                                    index=None,
-                                   placeholder="Odaberite jednu knjigu",
+                                   placeholder="Odaberite jednu knjigu.",
                                    format_func=opis_knjige
-                                   ) 
-
+                                   )
 # Pomoću 'selectbox' pravimo padajući izbornik. 
 # Pomoću varijable 'odabrani_indeks' znamo što je korisnik odabrao. 
 # Pomoću 'options' nudimo mogućnosti (opcije) koje će korisnik moći odabrati (biti mu na raspolaganje) za brisanje. Napravit će listu (točnije generator) od 0 do X. knjiga (koliko već ima knjiga). 
@@ -129,7 +130,7 @@ else: # Briše ako ima knjiga za brisanje. Prije smo brisali pomoću indeksa, al
 # 'placeholder' ispisuje korisniku da nije odabrana nijedna knjiga, već da mu piše tekst 'Odaberite jednu knjigu'.
 # Parametar 'format_func' služi za povezivanje s funkcijom 'opis_knjige'. Dakle, kad korisnik odabere jednu od ponuđenih vrijednosti (0, 1, 2..., n-1), taj odabrani broj će se proslijediti funkciji 'opis_knjige'. Ona će uzeti taj broj i vratiti što u tom redu (na tom indeksu) konkretno piše (naslov, autor, nakladnik, mjesto, godina, vrsta, ocjena).
 
-    # Kad korisnik gore odabere neku knjigu, onda će (dolje) stisnuti gumb za brisanje knjige. Oblikujemo taj gumb.
+    # Kad korisnik gore odabere neku knjigu, onda će (dolje) stisnuti gumb za brisanje knjige. Oblikujmo taj gumb.
     if st.button("Izbriši knjigu."):
         if odabrani_indeks is not None: # Provjeramo je li nešto odabrano. U početku je kod knjiga indeks postavljen na 'None', odnosno u početku nije ništa odabrano. Ako korisnik nije ništa odabrao za brisanje, a kliknuo je gumb za brisanje knjige, logično je da ne može ništa obrisati.
             redak_u_tablici =  odabrani_indeks + 2 # Pravimo novu varijablu 'redak_u_tablici'. To je redak koji će se obrisati. U pandas DataFrameu indeksi kreću od 0 i u njemu ne postoji zaglavlje. U našoj tablici (bazi) indeksi kreću od 1 i postoji zaglavlje. Prva knjiga je u tablici (baza u Google Sheetsu) na indeksu 2 (zaglavlje je na indeksu 1). U pandas DataFrameu je prva knjiga na indeksu 0. Stoga odabrani indeks povećavamo za 2.
