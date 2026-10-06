@@ -118,7 +118,7 @@ else: # Briše ako ima knjiga za brisanje. Prije smo brisali pomoću indeksa, al
     odabrani_indeks = st.selectbox("Odaberite knjigu za brisanje.",
                                    options=range(len(knjige)),
                                    index=None,
-                                   placeholder="Odaberite jednu knjigu.",
+                                   placeholder="Odaberite jednu knjigu koju želite obrisati iz tablice.",
                                    format_func=opis_knjige
                                    )
 # Pomoću 'selectbox' pravimo padajući izbornik. 
