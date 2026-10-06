@@ -46,12 +46,12 @@ else:
 st.subheader("Dodaj novu knjigu")
 
 with st.form("forma_za_dodavanje_knjige", clear_on_submit=True): # Pravimo obrazac za dodavanje knjiga. Unutar zagrade mu dajemo neki naziv koji nama neće nigdje trebati, ali 'streamlitu' treba da svaki obrazac ima svoj jedinstven naziv. Ako želimo da se polja očiste nakon unosa, onda postavljamo parametar 'clear_on_submit' na 'True'.
-    naslov = st.text_input("Naslov knjige:") # Sve napisano uvučeno je dio tog obrasca. Želimo da korisnik upiše naslov knjige.
-    autor = st.text_input("Autor knjige:")
-    nakladnik = st.text_input("Nakladnik (izdavač) knjige:")
-    mjesto = st.text_input("Mjesto izdavanja knjige:")
+    naslov = st.text_input("Naslov knjige:", placeholder="Primjerice: Rudnik čvaraka") # Sve napisano uvučeno je dio tog obrasca. Želimo da korisnik upiše naslov knjige.
+    autor = st.text_input("Autor knjige:", placeholder="Primjerice: Božidar Nagy")
+    nakladnik = st.text_input("Nakladnik (izdavač) knjige:", placeholder="Primjerice: Verbum")
+    mjesto = st.text_input("Mjesto izdavanja knjige:", placeholder="Primjerice: Garčin")
     godina = st.number_input("Godina izdavanja knjige:", min_value=1800, max_value=2026, value=None, placeholder="Unesite godinu.") # Početnu vrijednost za unesenu godinu postavljamo na 'None' jer ćemo kasnije provjeravati je li nešto upisano u tom polju. Ako nema ništa upisano ('None'), onda nećemo moći ništa dodati jer nismo sve unijeli. 'placeholder' je tekst koji će pisati u polju da bude jasno što tu treba upisati (kad kliknemo na polje i krenemo upisivati, automatski će se obrisati taj pomoćni tekst u polju).
-    vrsta = st.text_input("Vrsta knjige:")
+    vrsta = st.text_input("Vrsta knjige:", placeholder="Primjerice: roman")
     ocjena = st.slider("Ocjena knjige:", min_value=1, max_value=10, value=5) # 'slider' je klizač. 'value' je početno postavljena ocjena dok ne odaberemo neku drugu.
 
     gumb_dodaj = st.form_submit_button("Dodaj knjigu.") # Kod ovih obrazaca ne rade klasični (obični) gumbi koje smo prije koristili ('button'), već moramo imati posebne gumbe.
