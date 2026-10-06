@@ -146,7 +146,7 @@ else: # Briše ako ima knjiga za brisanje. Prije smo brisali pomoću indeksa, al
 
 # Najbolje knjige: Prikažimo najboljih pet knjiga po ocjeni.
 
-st.subheader("Najboljih pet knjiga po ocjeni") # To je podnaslov.
+st.subheader("Pet najboljih knjiga prema kriteriju ocjene (silazno sortirano)") # To je podnaslov.
 
 if knjige.empty:
     st.info("Nema nikakvih knjiga za prikaz.")
